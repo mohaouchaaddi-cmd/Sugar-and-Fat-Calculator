@@ -1,99 +1,155 @@
 import streamlit as st
 
+
+
+# ---------------- CONFIG ----------------
 st.set_page_config(
-    page_title="Fitness App",
-    page_icon="🏃",
+    page_title="Fitness & calories calculator            اللياقة وحساب الطاقة",
+    page_icon="🏃‍♂️",layout="centered"
+
 )
 
+# ---------------- SESSION STATE ----------------
+if "started" not in st.session_state:
+    st.session_state.started = False
 
-# ---------------- TITRE ----------------
-st.markdown(
-    """
-    <h2 style='color:#1E90FF; text-align:center;'>
-        🏃 Fitness & calories calculator<br>
-        اللياقة وحساب الطاقة
-    </h2>
-    """,
-    unsafe_allow_html=True
-)
-
-# ---------------- CARD INTRO ----------------
+# ---------------- STYLE GLOBAL ----------------
 st.markdown("""
-<div style="
-    padding:15px;
-    border-radius:15px;
-    background-color:#f5f7ff;
-    box-shadow:0px 2px 8px rgba(0,0,0,0.1);
-">
-<h3>💡 Goal</h3>
-Calculate: burned calories + glucose consumed + fat burned
-</div>
+<style>
+[data-testid="stAppViewContainer"] {
+    background-color: #f5f7fa;
+}
+
+/* HERO */
+.hero {
+    text-align: center;
+    padding: 40px 20px;
+    background: linear-gradient(90deg, #1E90FF, #00C6FF);
+    border-radius: 20px;
+    color: white;
+    box-shadow: 0px 6px 20px rgba(0,0,0,0.2);
+}
+
+/* BUTTON */
+div.stButton > button {
+    background: linear-gradient(90deg, #00C6FF, #0072FF);
+    color: white;
+    border-radius: 12px;
+    padding: 0.6em 1.2em;
+    font-size: 18px;
+    font-weight: bold;
+    border: none;
+    box-shadow: 0px 6px 15px rgba(0,0,0,0.15);
+    transition: 0.3s;
+}
+
+div.stButton > button:hover {
+    transform: scale(1.05);
+    cursor: pointer;
+}
+</style>
 """, unsafe_allow_html=True)
 
-st.write("")
+# ======================================================
+# 🟦 PAGE D'ACCUEIL
+# ======================================================
+if not st.session_state.started:
 
-# ---------------- INPUTS ----------------
-st.subheader("Inputs               المعطيات")
+    st.markdown("""
+    <div class="hero">
+        <h2>🏃 Fitness & calories monitoring</h2>
+        <h2>  اللياقة وتتبع طاقة الجسم </h2>
+       
+    </div>
+    """, unsafe_allow_html=True)
 
-weight = st.number_input("Weight (kg) الوزن", 40, 200, 70)
-duration = st.number_input("Duration (min)   مدة التمرين", 1, 300, 30)
+    st.markdown("")
 
-activity_label = st.selectbox(
-    "Activity          نوع التمرين",
-    ["Rest الراحة", "Walking المشي", "Running الجري"]
-)
+    st.write(
+        "Welcome! This app helps you estimate calories burned based on  activity "
 
-# 🔥 IMPORTANT FIX: mapping correct
-activity_map = {
-    "Rest الراحة": "Rest",
-    "Walking المشي": "Walking",
-    "Running الجري": "Running"
-}
+                       )
+    st.write(
+                "  مرحبا، تطبيق يساعدك على تتبع السكر واستهلاك الطاقة  ")
 
-activity = activity_map[activity_label]
+    if st.button(" Start "):
+        st.session_state.started = True
+        st.rerun()
 
-# ---------------- CALCUL ----------------
-met_values = {
-    "Rest": 1.3,
-    "Walking": 3.5,
-    "Running": 8.0
-}
+# ======================================================
+# 🏋️ APPLICATION
+# ======================================================
+else:
 
-fuel_split = {
-    "Rest": {"carbs": 0.2, "fat": 0.8},
-    "Walking": {"carbs": 0.5, "fat": 0.5},
-    "Running": {"carbs": 0.75, "fat": 0.25}
-}
+    st.markdown("## 🏃‍♂️ **Fitness Calculator**")
+    st.markdown("---")
 
-# Calories
-calories = met_values[activity] * weight * (duration / 60)
+    # ---------------- INPUTS ----------------
+    col1, col2 = st.columns(2)
 
-# Fuel breakdown
-carb_ratio = fuel_split[activity]["carbs"]
-fat_ratio = fuel_split[activity]["fat"]
+    with col1:
+        weight = st.number_input("Weight (kg) الوزن", 40, 200, 70)
 
-carb_cal = calories * carb_ratio
-fat_cal = calories * fat_ratio
+    with col2:
+        duration = st.number_input("Duration (min) مدة التمرين", 1, 300, 30)
 
-# Conversion
-carbs_g = carb_cal / 4
-fat_g = fat_cal / 9
+    activity = st.selectbox("Activity نوع التمرين", ["Rest", "Walking", "Running"])
 
-# ---------------- OUTPUT ----------------
-st.subheader("Outputs               النتائج    ")
-st.write("")
+    # ---------------- DATA ----------------
+    met_values = {
+        "Rest": 1.3,
+        "Walking": 3.5,
+        "Running": 8.0
+    }
 
-st.success(f"🔥 Burned calories : {calories:.2f} kcal")
+    fuel_split = {
+        "Rest": {"carbs": 0.2, "fat": 0.8},
+        "Walking": {"carbs": 0.5, "fat": 0.5},
+        "Running": {"carbs": 0.75, "fat": 0.25}
+    }
 
-col1, col2 = st.columns(2)
+    # ---------------- BUTTON ----------------
+    if st.button("🔥 Calculate calories"):
 
-with col1:
-    st.metric("🍬 Sugar  consumed    كمية السكر المستهلك", f"{carbs_g:.2f} g")
+        calories = met_values[activity] * weight * (duration / 60)
 
-with col2:
-    st.metric("🧈 Fat consumed        الدهون المستهلكة ", f"{fat_g:.2f} g")
+        carbs_g = (calories * fuel_split[activity]["carbs"]) / 4
+        fat_g = (calories * fuel_split[activity]["fat"]) / 9
 
+        # ---------------- RESULT ----------------
+        st.markdown(f"""
+        <div style="
+            padding:20px;
+            border-radius:15px;
+            background-color:#e8f5e9;
+            text-align:center;
+            font-size:22px;
+            font-weight:bold;
+            color:#2e7d32;">
+            🔥 {calories:.2f} kcal burned
+        </div>
+        """, unsafe_allow_html=True)
 
+        col1, col2 = st.columns(2)
 
-st.subheader("Note 👉")
+        with col1:
+            st.metric("🍬 Sugar (g)  سكر ", f"{carbs_g:.2f}")
+
+        with col2:
+            st.metric("🧈 Fat (g)     دهون", f"{fat_g:.2f}")
+
+        # ---------------- FEEDBACK ----------------
+        if calories < 100:
+            st.info("Light activity     نشاط خفبف💡")
+        elif calories < 300:
+            st.success("Good workout جيد 💪")
+        else:
+            st.warning("Very intense  نشاط مكثف🔥")
+
+    # ---------------- BACK BUTTON ----------------
+    st.markdown("---")
+    if st.button("⬅ Back to Home"):
+        st.session_state.started = False
+        st.rerun()
+ote 👉")
 st.write(" Sugar cub = 4g")

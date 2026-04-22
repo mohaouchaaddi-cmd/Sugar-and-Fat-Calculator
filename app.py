@@ -149,7 +149,7 @@ else:
         elif calories < 300:
             st.success("Good workout تمرين جيد 💪")
         else:
-            st.warning("Very intense نشاط مكثف 🔥")
+            st.warning("intensive training      نشاط مكثف 🔥")
 
     # ---------------- BACK BUTTON ----------------
     st.markdown("---")

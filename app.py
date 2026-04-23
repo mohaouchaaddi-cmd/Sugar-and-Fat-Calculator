@@ -110,7 +110,7 @@ else:
     }
 
     # ---------------- BUTTON ----------------
-    if st.button("🔥 Calculate calories"):
+    if st.button("🔥calories          السعرات الحرارية"):
 
         calories = met_values[activity] * weight * (duration / 60)
 

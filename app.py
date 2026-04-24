@@ -110,8 +110,7 @@ else:
     }
 
     # ---------------- BUTTON ----------------
-    if st.button("🔥Estimated used Calories         
-    السعرات الحرارية التقديرية المستهلكة"):
+    if st.button("🔥Estimated used Calories          السعرات الحرارية التقديرية المستهلكة"):
 
         calories = met_values[activity] * weight * (duration / 60)
 
